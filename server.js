@@ -1,7 +1,7 @@
 require("dotenv").config();
 const app = require("./app");
 const connectdb = require("./db/mongodb");
-const { dbConfig } = require("./config");
+const { dbConfig, discord } = require("./config");
 const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Events } = require("discord.js");
 const client = new Client({
   intents: [
@@ -20,9 +20,7 @@ client.on("ready", () => {
   console.log("Bot status: ", client.user.presence.status);
 });
 
-const token =
-  "MTA0NTk2NzIyMjQ4NjYwNTgzNA.GARd-E.Wv1rY8It53Xu0et1nls5ddPnKFxYeP3yZVN3bs";
-client.login(token);
+client.login(discord.token);
 
 client.on("messageCreate" , async message => {
   if(message.author.bot || !message.guild || message.channel.type === 'dm') return
