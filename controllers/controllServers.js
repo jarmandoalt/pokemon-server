@@ -106,6 +106,10 @@ async function nameServerUpdate(nameServers, avaibleServer) {
   }
 }
 
+async function config(req, res) {
+  res.status(200).send("hola")
+}
+
 async function findServer () {
   try {
     const nameFindServer = await nameServer.findOne({avaible: true})
@@ -139,5 +143,6 @@ module.exports = {
   deleteAllDocuments,
   nameServerUpdate,
   addNameServer,
-  findServer
+  findServer,
+  config
 };
