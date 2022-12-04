@@ -1,4 +1,4 @@
-//require("dotenv").config();
+require("dotenv").config();
 const app = require("./app");
 const connectdb = require("./db/mongodb");
 const { dbConfig, discord } = require("./config");
