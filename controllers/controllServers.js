@@ -37,17 +37,14 @@ async function getServerName(req, res) {
 async function serverName(name) {
   const server = await Server.find({ name: `${name}` })
   if (server.length === 0) {
-    console.log("log",server.length);
     return 0
   }
 }
 
 async function getServerUpdateCountMembers(req, res) {
-  console.log(req.query);
   let id = req.query.id,
     members = req.query.members,
     nameMember = req.query.nameMember
-    console.log(id,members);
   const server = await Server.findByIdAndUpdate( id, {countMembers: members, namesMembers: nameMember })
   res.status(200).send({ server });
 }
@@ -55,7 +52,6 @@ async function getServerUpdateCountMembers(req, res) {
 async function deleteServer(req, res) {
   const name = req.query.name,
     avaible = true
-  console.log(name);
     try {
       const result = await Server.deleteMany({ name: name });
       if (result) {
@@ -70,7 +66,7 @@ async function deleteServer(req, res) {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     } 
   nameServerUpdate(name, avaible)
 }
@@ -101,7 +97,6 @@ async function addNameServer(res) {
 }
 
 async function nameServerUpdate(nameServers, avaibleServer) {
-  console.log(nameServers, avaibleServer);
   try {
     const name = await nameServer.findOneAndUpdate({name: nameServers},{
         name: nameServers,
@@ -123,7 +118,6 @@ async function findServer () {
       setTimeout(async () => {
         const auxServerName = await serverName(nameFindServer.name)
         avaible = true
-        console.log("este", auxServerName);
         if (auxServerName === 0) {
           nameServerUpdate(nameFindServer.name, avaible)
         }
