@@ -13,7 +13,7 @@ const client = new Client({
 });
 let serversArk = require("./accessArkeanos")
 const SocketIo = require("socket.io");
-const { deleteAllDocuments, addNameServer, findServer } = require("./controllers/controllServers");
+const { deleteAllDocuments, addNameServer, findServer, addNewUser, getNewUser, updateNewUser } = require("./controllers/controllServers");
 
 client.on("ready", () => {
   console.log("Logged In as", client.user.tag);
@@ -92,6 +92,7 @@ connectdb(dbConfig);
 const server = app.listen(5052, () => {
   console.log(`server on port ${5052}`);
   //addNameServer() 
+  //addNewUser()
 });
 
 const io = SocketIo(server, {
@@ -100,7 +101,9 @@ const io = SocketIo(server, {
   },
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
+  let resGetNewUser = await getNewUser()
+  updateNewUser(resGetNewUser + 1)
 
   socket.on("create", (create) => {
     socket.join(create.nameServer);

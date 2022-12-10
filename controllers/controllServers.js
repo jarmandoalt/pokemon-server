@@ -1,5 +1,6 @@
 const Server = require("../db/schemaServer");
 const nameServer = require("../db/schemaNameServer")
+const newUser = require("../db/schemaNewUser")
 let serversArk = require("../accessArkeanos")
 
 async function addServer(req, res) {
@@ -134,6 +135,35 @@ async function findServer () {
   }
 }
 
+async function addNewUser(res) {
+  console.log("dentro");
+  try {
+      
+    const newuser = newUser({
+        numberUser : 1
+      });
+  
+    const newusers = await newuser.save();
+      
+  } catch (e) {
+    res.status(500).send({ message: e.message });
+  }
+}
+
+async function getNewUser(req, res) {
+  const findNewUser = await newUser.find().lean().exec();
+  return findNewUser[0].numberUser
+}
+
+async function getNewUserApi(req, res) {
+  const findNewUser = await newUser.find().lean().exec();
+  res.status(200).send({ findNewUser });
+}
+
+async function updateNewUser(number, res) {
+  const server = await newUser.findByIdAndUpdate( "63944046b32fe74b626de5de", {numberUser: number })
+}
+
 module.exports = {
   addServer,
   getServer,
@@ -144,5 +174,9 @@ module.exports = {
   nameServerUpdate,
   addNameServer,
   findServer,
-  config
+  config,
+  addNewUser,
+  getNewUser,
+  updateNewUser,
+  getNewUserApi
 };
