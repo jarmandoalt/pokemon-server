@@ -101,9 +101,9 @@ const io = SocketIo(server, {
   },
 });
 
-io.on("connection", async (socket) => {
-  let resGetNewUser = await getNewUser()
-  updateNewUser(resGetNewUser + 1)
+io.on("connection", (socket) => {
+  /* let resGetNewUser = await getNewUser()
+  updateNewUser(resGetNewUser + 1) */
 
   socket.on("create", (create) => {
     socket.join(create.nameServer);
