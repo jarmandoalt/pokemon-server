@@ -40,7 +40,7 @@ client.on("messageCreate" , async message => {
       const link = new ActionRowBuilder()
 			.addComponents(
         new ButtonBuilder()
-        .setURL("http://google.com")
+        .setURL("https://who-is-this-pokemon.onrender.com/home")
 					.setLabel('Ir a la pagina')
 					.setStyle(ButtonStyle.Link)
 			);
@@ -61,7 +61,7 @@ client.on(Events.InteractionCreate, async interaction => {
   const link = new ActionRowBuilder()
 			.addComponents(
         new ButtonBuilder()
-        .setURL("http://google.com")
+        .setURL("https://who-is-this-pokemon.onrender.com/home")
 					.setLabel('Ir a la pagina')
 					.setStyle(ButtonStyle.Link)
 			);
@@ -79,7 +79,7 @@ client.on(Events.InteractionCreate, async interaction => {
   const link = new ActionRowBuilder()
 			.addComponents(
         new ButtonBuilder()
-        .setURL("http://google.com")
+        .setURL("https://who-is-this-pokemon.onrender.com/home")
 					.setLabel('Ir a la pagina')
 					.setStyle(ButtonStyle.Link)
 			);
@@ -101,50 +101,59 @@ const io = SocketIo(server, {
   },
 });
 
-io.on("connection", (socket) => {
-  /* let resGetNewUser = await getNewUser()
-  updateNewUser(resGetNewUser + 1) */
+io.on("connection", async (socket) => {
+  let resGetNewUser = await getNewUser()
+  updateNewUser(resGetNewUser + 1)
 
   socket.on("create", (create) => {
     socket.join(create.nameServer);
-    socket.emit("create", { create: create, id: socket.id });
+    io.to(create.nameServer).emit("create", { create: create, id: socket.id });
   });
 
   socket.on("join", (join) => {
-    socket.to(join.nameServer).emit("join", { join: join, id: socket.id });
+    socket.join(join.nameServer);
+    io.to(join.nameServer).emit("join", { join: join, id: socket.id });
   });
 
   socket.on("updateData", (updateData) => {
-    socket.broadcast.emit("updateData", updateData);
+    io.to(updateData.nameServer).emit("updateData", updateData);
   });
 
   socket.on("startGame", (startGame) => {
-    socket.broadcast.emit("startGame", startGame);
+    io.emit("startGame", startGame);
   });
 
   socket.on("correct", (correct) => {
-    socket.broadcast.emit("correct", correct);
+    io.emit("correct", correct);
   });
 
   socket.on("deleteMember", (deleteMember) => {
-    socket.broadcast.emit("deleteMember", deleteMember);
+    io.emit("deleteMember", deleteMember);
   });
 
-  socket.on("deleteAdmin", (deleteAdmin) => {
-    socket.broadcast.emit("deleteAdmin", deleteAdmin);
+  socket.on("deleteAllMember", (deleteAllMember) => {
+    io.to(deleteAllMember.nameServer).emit("deleteAllMember", deleteAllMember);
   });
 
+  
   socket.on("returnGame", (returnGame) => {
-    socket.broadcast.emit("returnGame", returnGame);
+    io.emit("returnGame", returnGame);
+  });
+  
+  socket.on("dataGameMember", (dataGameMember) => {
+    io.emit("dataGameMember", dataGameMember);
+  });
+  
+  socket.on("deleteAdmin", (deleteAdmin) => {
+    socket.leave(deleteAdmin.nameServer);
   });
 
-  socket.on("dataGameMember", (dataGameMember) => {
-    socket.broadcast.emit("dataGameMember", dataGameMember);
+  socket.on("leaveRoomMember", (deleteAllMember) => {
+    socket.leave(deleteAllMember.nameServer);
   });
 
   socket.on("exitMember", (exitMember) => {
-    socket.broadcast.to(exitMember.nameServer).emit("exitMember", exitMember);
-    socket.leave(exitMember.nameServer);
+    //socket.leave(exitMember.nameServer);
+    io.to(exitMember.nameServer).emit("exitMember", exitMember);
   });
 });
-
