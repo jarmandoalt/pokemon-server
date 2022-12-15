@@ -1,3 +1,4 @@
+const moment = require('node-moment');
 const Server = require("../db/schemaServer");
 const nameServer = require("../db/schemaNameServer")
 const newUser = require("../db/schemaNewUser")
@@ -39,6 +40,8 @@ async function serverName(name) {
   const server = await Server.find({ name: `${name}` })
   if (server.length === 0) {
     return 0
+  } else {
+    return server
   }
 }
 
@@ -70,6 +73,17 @@ async function deleteServer(req, res) {
       console.log(error)
     } 
   nameServerUpdate(name, avaible)
+}
+
+async function deleteServerInto(names) {
+  const avaible = true
+    try {
+      const result = await Server.deleteMany({ name: names });
+      
+    } catch (error) {
+      console.log(error)
+    } 
+  nameServerUpdate(names, avaible)
 }
 
 async function deleteAllDocuments(res) {
@@ -135,6 +149,34 @@ async function findServer () {
   }
 }
 
+ 
+async function deleteServerOffline () {
+  try {
+    const nameFindServer = await nameServer.find({avaible: false})
+    if (nameFindServer === null) {
+      return "full"
+    } else {
+      for (let index = 0; index < nameFindServer.length; index++) {
+        const nameServerUse = nameFindServer[index].name;
+        const dataServers = await serverName(nameServerUse)
+        if (Number(moment().format("HH")) < 2) {
+          let aux = (Number(moment().format("HH")) + 24) - Number(moment.utc(dataServers[0].updatedAt).format("HH"))
+          if (aux >= 2) {
+            await deleteServerInto(dataServers[0].name)
+          }
+        } else {
+          let aux = Number(moment().format("HH")) - Number(moment.utc(dataServers[0].updatedAt).format("HH"))
+          if (aux >= 2) {
+            await deleteServerInto(dataServers[0].name)
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 async function addNewUser(res) {
   console.log("dentro");
   try {
@@ -178,5 +220,6 @@ module.exports = {
   addNewUser,
   getNewUser,
   updateNewUser,
-  getNewUserApi
+  getNewUserApi,
+  deleteServerOffline
 };
