@@ -112,10 +112,11 @@ const server = app.listen(5052, () => {
   console.log(`server on port ${5052}`);
   //addNameServer()
   //addNewUser()
-  setInterval(() => {
-    deleteServerOffline();
-  }, 7200000);
 });
+
+const intervalMessage = setInterval(() => {
+  deleteServerOffline();
+}, 300000);
 
 const io = SocketIo(server, {
   cors: {

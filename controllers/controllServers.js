@@ -5,7 +5,7 @@ const newUser = require("../db/schemaNewUser")
 let serversArk = require("../accessArkeanos")
 
 async function addServer(req, res) {
-  const { name, generations, creatorId, countMembers, namesMembers} = req.query,
+  const { name, generations, creatorId, countMembers, namesMembers, numberGames} = req.query,
     avaible = false 
   try {
 
@@ -14,7 +14,8 @@ async function addServer(req, res) {
       generations,
       creatorId,
       countMembers,
-      namesMembers
+      namesMembers,
+      numberGames
     });
 
     const servers = await server.save();
@@ -121,6 +122,19 @@ async function nameServerUpdate(nameServers, avaibleServer) {
   }
 }
 
+async function numberGamesUpdate(req, res) {
+  let nameServer = req.query.name,
+    numberGames = req.query.number
+    console.log(req.query);
+  try {
+    const name = await Server.findOneAndUpdate({name: nameServer},{
+        name: nameServer,
+        numberGames: numberGames})
+  } catch (error) {
+  console.log(error);
+  }
+}
+
 async function config(req, res) {
   res.status(200).send("hola")
 }
@@ -156,20 +170,33 @@ async function deleteServerOffline () {
     if (nameFindServer === null) {
       return "full"
     } else {
-      for (let index = 0; index < nameFindServer.length; index++) {
+      //bucle para buscar en el array de servidores en uso
+      for (let index = 0; index < nameFindServer.length; index++) { 
         const nameServerUse = nameFindServer[index].name;
+        //obteniendo informacion de cada uno de los servidores en uso
         const dataServers = await serverName(nameServerUse)
-        if (Number(moment().format("HH")) < 2) {
-          let aux = (Number(moment().format("HH")) + 24) - Number(moment.utc(dataServers[0].updatedAt).format("HH"))
-          if (aux >= 2) {
-            await deleteServerInto(dataServers[0].name)
+        
+          let auxUpdateHr = Number(moment(dataServers[index].updatedAt, moment.ISO_8601).format("HH")),
+          auxUpdateMin = Number(moment(dataServers[index].updatedAt, moment.ISO_8601).format("mm")),
+          auxActualHr = Number(moment().format("HH")),
+          auxActualMin = Number(moment().format("mm"))
+          console.log(`update: ${auxUpdateHr}:${auxUpdateMin} ` );
+
+          if (auxActualHr !== auxUpdateHr) {
+            let auxMinActual = 59 - auxUpdateMin,
+              auxSumMin = auxMinActual + auxActualMin
+            if (auxSumMin < 50) {
+              console.log(`borrado el server ${dataServers[index].name} por falta de uso`);
+              await deleteServerInto(dataServers[index].name)
+            }
+          } else {
+            let auxRes = auxActualMin - auxUpdateMin 
+            console.log("difUpdate: ",auxRes);
+            if (auxRes > 50) {
+              console.log(`borrado el server ${dataServers[index].name} por falta de uso`);
+              await deleteServerInto(dataServers[index].name)
+            }
           }
-        } else {
-          let aux = Number(moment().format("HH")) - Number(moment.utc(dataServers[0].updatedAt).format("HH"))
-          if (aux >= 2) {
-            await deleteServerInto(dataServers[0].name)
-          }
-        }
       }
     }
   } catch (e) {
@@ -212,6 +239,7 @@ module.exports = {
   getServerName,
   getServerUpdateCountMembers,
   deleteServer,
+  numberGamesUpdate,
   deleteAllDocuments,
   nameServerUpdate,
   addNameServer,

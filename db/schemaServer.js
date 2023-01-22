@@ -6,7 +6,8 @@ const schemaServer = new Schema ({
     generations: String,
     creatorId: String,
     countMembers: Number,
-    namesMembers: Array
+    namesMembers: Array,
+    numberGames: Number
 },{
     timestamps: true
 })
