@@ -90,10 +90,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const exampleEmbed = new EmbedBuilder()
       .setColor(0x0099ff)
       .setTitle("Hola!")
-      .setDescription(`Esta es tu key: ${dataFind}`)
+      .setDescription(`Esta es tu key: ${dataFind}
+      Sugerencias y contacto: 
+      @jarmandoalt
+      jarmandoalt@gmail.com`)
       .setTimestamp()
       .setFooter({
-        text: "La key solo sera valida por 5min asi que corre a usarla",
+        text: "La key solo sera valida por 5 min asi que corre a usarla",
       });
 
     const link = new ActionRowBuilder().addComponents(
@@ -102,7 +105,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
         .setLabel("Ir a la pagina")
         .setStyle(ButtonStyle.Link)
     );
-
     interaction.user.send({ components: [link], embeds: [exampleEmbed] });
   }
 });
